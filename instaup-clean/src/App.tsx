@@ -14,6 +14,9 @@ import ToastNotification, { useToast } from './components/ToastNotification'
 import CustomerSupportChat from './components/CustomerSupportChat'
 import ServerStatusMonitor from './components/ServerStatusMonitor'
 
+// API 테스트 서비스 (개발용)
+import './services/testApi'
+
 // 페이지 컴포넌트들
 import OrdersPage from './pages/OrdersPage'
 import AddFundsPage from './pages/AddFundsPage'

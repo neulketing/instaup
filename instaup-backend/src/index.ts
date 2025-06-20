@@ -51,6 +51,16 @@ app.use('/api/admin', adminRoutes)
 app.use('/api/analytics', analyticsRoutes)
 app.use('/api/referral', referralRoutes)
 
+// Test API route (임시)
+app.get('/api/test', (req, res) => {
+  res.json({
+    success: true,
+    message: 'API 라우트 테스트 성공',
+    timestamp: new Date().toISOString(),
+    cors: 'enabled'
+  })
+})
+
 // Health check endpoints
 app.get('/health', async (req, res) => {
   try {

@@ -27,7 +27,7 @@
 - [x] 실시간 주문 추적
 - [x] 프론트엔드 의존성 수정 (react-toastify)
 
-## 🔄 진행 중인 작업
+## ✅ 완료된 작업 (2024.06.20)
 
 ### 📦 Railway 백엔드 배포 ✅ **100% 완료!**
 - [x] Railway 웹 인터페이스를 통한 백엔드 배포
@@ -42,6 +42,23 @@
 - [x] 헬스체크 엔드포인트 정상 작동 확인
 - [x] Railway 도메인 생성 완료: `instaup-production.up.railway.app`
 - [x] 공개 헬스체크 테스트 성공 (200 OK, 데이터베이스 연결 확인)
+
+## 🔄 진행 중인 작업
+
+### 🔗 프론트엔드-백엔드 연동 ⏳ **진행 중 (70%)**
+- [x] 프론트엔드 환경변수 설정 완료
+  - [x] VITE_API_BASE_URL=https://instaup-production.up.railway.app
+  - [x] VITE_BACKEND_API_URL=https://instaup-production.up.railway.app
+- [x] 백엔드 CORS 설정 업데이트 완료
+  - [x] localhost:5173 (로컬 개발) 지원 추가
+  - [x] 프로덕션 도메인들 추가
+  - [x] Railway 재배포 완료
+- [x] API 테스트 서비스 구현
+  - [x] testApi.ts 생성 (브라우저 콘솔에서 테스트 가능)
+  - [x] window.testAPI 전역 함수 노출
+- [ ] API 연동 테스트 및 검증
+- [ ] 인증 시스템 연동 확인
+- [ ] 주문 시스템 연동 확인
 
 ## 📅 다음 우선순위 작업
 
