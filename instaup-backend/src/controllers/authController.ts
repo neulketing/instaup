@@ -167,15 +167,17 @@ export const register = async (req: Request, res: Response): Promise<any> => {
       return user
     })
 
+    const jwtSecret = process.env.JWT_SECRET || 'instaup_dev_secret_key_very_long_string_for_security_2024'
+
     const token = jwt.sign(
       { userId: result.id, email: result.email },
-      process.env.JWT_SECRET!,
+      jwtSecret,
       { expiresIn: '7d' }
     )
 
     const refreshToken = jwt.sign(
       { userId: result.id, email: result.email, type: 'refresh' },
-      process.env.JWT_SECRET!,
+      jwtSecret,
       { expiresIn: '30d' }
     )
 
@@ -211,15 +213,17 @@ export const login = async (req: Request, res: Response): Promise<any> => {
       })
     }
 
+    const jwtSecret = process.env.JWT_SECRET || 'instaup_dev_secret_key_very_long_string_for_security_2024'
+
     const token = jwt.sign(
       { userId: user.id, email: user.email },
-      process.env.JWT_SECRET!,
+      jwtSecret,
       { expiresIn: '7d' }
     )
 
     const refreshToken = jwt.sign(
       { userId: user.id, email: user.email, type: 'refresh' },
-      process.env.JWT_SECRET!,
+      jwtSecret,
       { expiresIn: '30d' }
     )
 
@@ -283,8 +287,10 @@ export const refreshToken = async (req: Request, res: Response): Promise<any> =>
 
     // 실제 환경에서는 refreshToken을 DB에 저장하고 검증해야 합니다.
     // 현재는 JWT로 간단하게 처리
+    const jwtSecret = process.env.JWT_SECRET || 'instaup_dev_secret_key_very_long_string_for_security_2024'
+
     try {
-      const decoded = jwt.verify(refreshToken, process.env.JWT_SECRET!) as any
+      const decoded = jwt.verify(refreshToken, jwtSecret) as any
 
       const user = await prisma.user.findUnique({
         where: { id: decoded.userId, isActive: true },
@@ -309,7 +315,7 @@ export const refreshToken = async (req: Request, res: Response): Promise<any> =>
       // 새로운 액세스 토큰 생성
       const newAccessToken = jwt.sign(
         { userId: user.id, email: user.email },
-        process.env.JWT_SECRET!,
+        jwtSecret,
         { expiresIn: '7d' }
       )
 

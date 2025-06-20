@@ -13,6 +13,7 @@ import AIRecommendationPanel from './components/AIRecommendationPanel'
 import ToastNotification, { useToast } from './components/ToastNotification'
 import CustomerSupportChat from './components/CustomerSupportChat'
 import ServerStatusMonitor from './components/ServerStatusMonitor'
+import APITestPanel from './components/APITestPanel'
 
 // API 테스트 서비스 (개발용)
 import './services/testApi'
@@ -303,6 +304,11 @@ function AppContent() {
                 onAuth={handleAuth}
                 onShowRecharge={handleShowRecharge}
               />
+
+              {/* API 테스트 패널 (임시로 항상 표시) */}
+              <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 my-8">
+                <APITestPanel />
+              </div>
 
               {/* AI 추천 패널 (홈페이지에만 표시) */}
               {userSession && (

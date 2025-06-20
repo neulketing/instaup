@@ -13,7 +13,8 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
       })
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any
+    const jwtSecret = process.env.JWT_SECRET || 'instaup_dev_secret_key_very_long_string_for_security_2024'
+    const decoded = jwt.verify(token, jwtSecret) as any
 
     const user = await prisma.user.findUnique({
       where: { id: decoded.userId, isActive: true },
