@@ -1,4 +1,4 @@
-export class DashboardMetricsDto {
+export interface DashboardMetricsDto {
   totalUsers: number;
   totalOrders: number;
   totalRevenue: number;

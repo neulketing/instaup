@@ -38,12 +38,37 @@ app.use('/api/payment', payment_1.default);
 app.use('/api/admin', admin_1.default);
 app.use('/api/analytics', analytics_1.default);
 app.use('/api/referral', referral_1.default);
-app.get('/health', (req, res) => {
+app.get('/health', async (req, res) => {
+    try {
+        await exports.prisma.$queryRaw `SELECT 1`;
+        res.json({
+            status: 'OK',
+            timestamp: new Date().toISOString(),
+            uptime: process.uptime(),
+            environment: process.env.NODE_ENV || 'development',
+            database: 'connected',
+            version: '1.0.0',
+            phase: 'skeleton'
+        });
+    }
+    catch (error) {
+        res.status(503).json({
+            status: 'ERROR',
+            timestamp: new Date().toISOString(),
+            uptime: process.uptime(),
+            environment: process.env.NODE_ENV || 'development',
+            database: 'disconnected',
+            error: 'Database connection failed'
+        });
+    }
+});
+app.get('/version', (req, res) => {
     res.json({
-        status: 'OK',
+        version: '1.0.0',
+        phase: 'skeleton',
+        build: process.env.RAILWAY_GIT_COMMIT_SHA || 'local',
         timestamp: new Date().toISOString(),
-        uptime: process.uptime(),
-        environment: process.env.NODE_ENV
+        node_version: process.version
     });
 });
 app.use(errorHandler_1.errorHandler);

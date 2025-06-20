@@ -32,6 +32,13 @@ model User {
 
   orders    Order[]
   payments  Payment[] // 충전 내역
+  topUps    TopUp[]   // 추가된 relation
+
+  // Referral relations
+  referrerReferrals Referral[] @relation("ReferrerUser") // 내가 추천한 사람들
+  referredReferrals Referral[] @relation("ReferredUser") // 나를 추천한 기록들
+  referralStats     ReferralStats[] // 추천 통계
+
   // sessions Session[] // If using database sessions for auth
 }
 
@@ -122,6 +129,8 @@ model Order {
 
   refillDetails Json?     // Info about refills: { requestedAt: "", count: 0, lastRefillAt: "" }
 
+  // Relations
+  referralCommissions ReferralCommission[] // 이 주문으로 생성된 커미션들
 
   @@index([userId, createdAt])
   @@index([serviceId])

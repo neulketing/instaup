@@ -44,13 +44,40 @@ app.use('/api/admin', adminRoutes)
 app.use('/api/analytics', analyticsRoutes)
 app.use('/api/referral', referralRoutes)
 
-// Health check
-app.get('/health', (req, res) => {
+// Health check endpoints
+app.get('/health', async (req, res) => {
+  try {
+    // Test database connection
+    await prisma.$queryRaw`SELECT 1`
+
+    res.json({
+      status: 'OK',
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime(),
+      environment: process.env.NODE_ENV || 'development',
+      database: 'connected',
+      version: '1.0.0',
+      phase: 'skeleton'
+    })
+  } catch (error) {
+    res.status(503).json({
+      status: 'ERROR',
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime(),
+      environment: process.env.NODE_ENV || 'development',
+      database: 'disconnected',
+      error: 'Database connection failed'
+    })
+  }
+})
+
+app.get('/version', (req, res) => {
   res.json({
-    status: 'OK',
+    version: '1.0.0',
+    phase: 'skeleton',
+    build: process.env.RAILWAY_GIT_COMMIT_SHA || 'local',
     timestamp: new Date().toISOString(),
-    uptime: process.uptime(),
-    environment: process.env.NODE_ENV
+    node_version: process.version
   })
 })
 
