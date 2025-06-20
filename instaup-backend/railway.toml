@@ -1,4 +1,3 @@
-# Railway.toml - Fixed version without shell commands
 [build]
 command = "npm install && npm run build"
 
