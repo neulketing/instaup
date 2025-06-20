@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import type { UserSession } from '../utils/auth'
+import { NotificationButton } from './RealtimeNotifications'
 
 interface HeaderProps {
   userSession: UserSession | null
@@ -9,6 +10,7 @@ interface HeaderProps {
   onShowOrders: () => void
   onShowAccount: () => void
   onShowAdmin: () => void
+  onShowNotifications: () => void
   onToggleMobileMenu: () => void
 }
 
@@ -20,6 +22,7 @@ export default function Header({
   onShowOrders,
   onShowAccount,
   onShowAdmin,
+  onShowNotifications,
   onToggleMobileMenu
 }: HeaderProps) {
   const navigate = useNavigate()
@@ -103,6 +106,13 @@ export default function Header({
                 <div className="text-sm text-gray-600">
                   잔액: <span className="font-bold text-[#22426f]">{userSession.balance?.toLocaleString() || '0'}원</span>
                 </div>
+
+                {/* 실시간 알림 버튼 */}
+                <NotificationButton
+                  userId={userSession.userId}
+                  onClick={onShowNotifications}
+                />
+
                 <button
                   onClick={onShowOrders}
                   className="text-[#22426f] hover:bg-blue-50 px-3 py-2 rounded transition-colors font-medium"

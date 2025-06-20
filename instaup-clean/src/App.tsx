@@ -14,6 +14,7 @@ import ToastNotification, { useToast } from './components/ToastNotification'
 import CustomerSupportChat from './components/CustomerSupportChat'
 import ServerStatusMonitor from './components/ServerStatusMonitor'
 import APITestPanel from './components/APITestPanel'
+import RealtimeNotifications from './components/RealtimeNotifications'
 
 // API 테스트 서비스 (개발용)
 import './services/testApi'
@@ -42,6 +43,7 @@ function AppContent() {
   const [showOrderHistoryModal, setShowOrderHistoryModal] = useState(false)
   const [showAdminDashboard, setShowAdminDashboard] = useState(false)
   const [showCustomerChat, setShowCustomerChat] = useState(false)
+  const [showNotifications, setShowNotifications] = useState(false)
   const [selectedService, setSelectedService] = useState<ServiceItem | null>(null)
   const [authLoading, setAuthLoading] = useState(false)
   const [authError, setAuthError] = useState<string | null>(null)
@@ -288,6 +290,7 @@ function AppContent() {
         onShowOrders={handleShowOrders}
         onShowAccount={handleShowAccount}
         onShowAdmin={handleShowAdmin}
+        onShowNotifications={() => setShowNotifications(true)}
         onToggleMobileMenu={() => setShowMobileMenu(!showMobileMenu)}
       />
 
@@ -419,6 +422,13 @@ function AppContent() {
           userSession={userSession}
         />
       )}
+
+      {/* 실시간 알림 */}
+      <RealtimeNotifications
+        userId={userSession?.userId || null}
+        isVisible={showNotifications}
+        onClose={() => setShowNotifications(false)}
+      />
 
       {/* 고객 지원 채팅 */}
       {showCustomerChat && (
