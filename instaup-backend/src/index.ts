@@ -26,7 +26,14 @@ export const prisma = new PrismaClient()
 // Middleware
 app.use(helmet())
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || "https://delicate-profiterole-bbf92a.netlify.app",
+  origin: [
+    "http://localhost:5173",
+    "http://localhost:3000",
+    "http://localhost:5174",
+    "https://instaup-clean.netlify.app",
+    "https://delicate-profiterole-bbf92a.netlify.app",
+    process.env.CORS_ORIGIN || "https://same-4001w3tt33q-latest.netlify.app"
+  ].filter(Boolean),
   credentials: true
 }))
 app.use(morgan('combined'))
