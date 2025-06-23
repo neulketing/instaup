@@ -75,16 +75,30 @@ app.get('/health', async (req, res) => {
       environment: process.env.NODE_ENV || 'development',
       database: 'connected',
       version: '1.0.0',
-      phase: 'skeleton'
+      phase: 'production-ready',
+      port: process.env.PORT || 3000,
+      cors_origins: [
+        "https://instaup.kr",
+        "https://instaup-clean.netlify.app",
+        process.env.CORS_ORIGIN
+      ].filter(Boolean),
+      railway_deployment: process.env.RAILWAY_GIT_COMMIT_SHA ? 'active' : 'local'
     })
   } catch (error) {
+    console.error('Health check database error:', error);
     res.status(503).json({
       status: 'ERROR',
       timestamp: new Date().toISOString(),
       uptime: process.uptime(),
       environment: process.env.NODE_ENV || 'development',
       database: 'disconnected',
-      error: 'Database connection failed'
+      error: 'Database connection failed',
+      error_details: error.message,
+      env_check: {
+        DATABASE_URL: process.env.DATABASE_URL ? 'SET' : 'MISSING',
+        PORT: process.env.PORT || 'DEFAULT:3000',
+        NODE_ENV: process.env.NODE_ENV || 'NOT_SET'
+      }
     })
   }
 })
@@ -107,26 +121,70 @@ const PORT = process.env.PORT || 3000
 
 async function startServer() {
   try {
-    // Connect to database
-    await prisma.$connect()
-    console.log('✅ Database connected successfully')
+    // Connect to database with retry logic
+    let retryCount = 0;
+    const maxRetries = 5;
 
-    const server = await (async () => { // wrap express with HTTP server and socket
-      const httpServer = require('http').createServer(app)
-      const { Server } = require('socket.io')
-      const { initializeSocket } = require('./services/socketService')
-      const io = new Server(httpServer, { cors: { origin: process.env.CORS_ORIGIN, credentials: true } })
-      initializeSocket(io)
-      httpServer.listen(PORT, () => {
-        console.log(`🚀 INSTAUP Backend Server with WebSocket running on port ${PORT}`)
-      })
-      return httpServer
-    })()
+    while (retryCount < maxRetries) {
+      try {
+        await prisma.$connect()
+        console.log('✅ Database connected successfully')
+        break;
+      } catch (dbError) {
+        retryCount++;
+        console.log(`❌ Database connection attempt ${retryCount}/${maxRetries} failed:`, dbError);
+        if (retryCount === maxRetries) {
+          throw dbError;
+        }
+        await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 seconds before retry
+      }
+    }
 
-    // Replace original app.listen with no-op since server started above
-    // startServer()
+    // Create HTTP server with Socket.io
+    const httpServer = require('http').createServer(app)
+
+    // Initialize Socket.io with more permissive CORS for Railway
+    const { Server } = require('socket.io')
+    const { initializeSocket } = require('./services/socketService')
+    const io = new Server(httpServer, {
+      cors: {
+        origin: [
+          "https://instaup.kr",
+          "https://instaup-clean.netlify.app",
+          "http://localhost:5173",
+          process.env.CORS_ORIGIN
+        ].filter(Boolean),
+        credentials: true
+      }
+    })
+
+    initializeSocket(io)
+
+    // Start server on 0.0.0.0 for Railway compatibility
+    httpServer.listen(PORT, '0.0.0.0', () => {
+      console.log(`🚀 INSTAUP Backend Server running on port ${PORT}`)
+      console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`)
+      console.log(`🗄️ Database: ${process.env.DATABASE_URL ? 'Connected' : 'No DATABASE_URL'}`)
+      console.log(`🌐 CORS Origins: ${JSON.stringify([
+        "https://instaup.kr",
+        "https://instaup-clean.netlify.app",
+        process.env.CORS_ORIGIN
+      ].filter(Boolean))}`)
+    })
+
+    return httpServer
   } catch (error) {
-    console.error('Failed to start server:', error)
+    console.error('❌ Failed to start server:', error)
+    console.error('Error details:', {
+      message: error.message,
+      stack: error.stack,
+      env: {
+        NODE_ENV: process.env.NODE_ENV,
+        PORT: process.env.PORT,
+        DATABASE_URL: process.env.DATABASE_URL ? 'SET' : 'NOT_SET',
+        CORS_ORIGIN: process.env.CORS_ORIGIN || 'NOT_SET'
+      }
+    })
     process.exit(1)
   }
 }
